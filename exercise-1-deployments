@@ -33,3 +33,100 @@ spec:
             port: 80
           initialDelaySeconds: 5
           periodSeconds: 10
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync-api
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: sync-api
+  template:
+    metadata:
+      labels:
+        app: sync-api
+    spec:
+      nodeSelector:
+        env: "staging"
+      containers:
+      - name: sync-api-container
+        image: nginx:latest
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopping-cart-app
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: shopping-cart-app
+  template:
+    metadata:
+      labels:
+        app: shopping-cart-app
+    spec:
+      nodeSelector:
+        team: "developers"
+        env: "staging"
+      containers:
+      - name: shopping-cart-container
+        image: nginx:latest
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-processor
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend-processor
+  template:
+    metadata:
+      labels:
+        app: backend-processor
+    spec:
+      nodeSelector:
+        team: "developers"
+        env: "staging"
+        critical: "yes"
+      containers:
+      - name: backend-processor-container
+        image: nginx:latest
+        ports:
+        - containerPort: 9000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-builder
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: queue-builder
+  template:
+    metadata:
+      labels:
+        app: queue-builder
+    spec:
+      nodeSelector:
+        team: "developers"
+        env: "staging"
+        critical: "no"
+      containers:
+      - name: queue-builder-container
+        image: nginx:latest
+        ports:
+        - containerPort: 9000
